@@ -5,7 +5,7 @@ import os
 from datetime import datetime, timedelta
 import random
 
-# VERSION 1.0.0
+# VERSION 1.0.1
 
 config = json.load(open('config.json'))
 
@@ -53,6 +53,7 @@ class MyClient(discord.Client):
     async def on_message(self, message):
         lSQL =f'''SELECT * FROM USERS WHERE USERID = '{message.author.id}';'''
         user = DatabaseConnection(lSQL)
+        if (message.author.bot == True): return
 
         if not user: 
             lSQL= f'''
@@ -70,7 +71,7 @@ class MyClient(discord.Client):
                 '''
                 DatabaseConnection(lSQL)
         
-        if(message.content.lower() == "!xp"):
+        if(message.content.lower() == f"{config['prefix']}xp"):
             lSQL =f'''SELECT * FROM USERS WHERE USERID = '{message.author.id}';'''
             user = DatabaseConnection(lSQL)
             xp = user[0][3]
@@ -79,10 +80,24 @@ class MyClient(discord.Client):
             aktuelles_level = current_level[0][0]
             xp_needed_for_next_level = current_level[0][1]
             await message.channel.send(f"""Dein aktuelles Level ist: {aktuelles_level} mit {xp} XP.\nDu brauchst noch {xp_needed_for_next_level - xp} XP für das nächste Level!\nFrohes Chatten!""")
+        
+        if(message.content.lower() == f"{config['prefix']}top"):
+            lSQL =f'''SELECT * FROM USERS ORDER BY XP DESC LIMIT 5;'''
+            top5 = DatabaseConnection(lSQL)
+            top5list = ""
+            i = 1
+            for entry in top5:  
+                top5list = top5list + f"{i}. {entry[1]} - {entry[3]}xp.\n"
+                i += 1
+            await message.channel.send(top5list)
+
+        if(message.content.lower() == f"{config['prefix']}help"):
+            await message.channel.send("Folgende Befehle sind verfügbar: \n!xp - Zeigt dein aktuelles Level/Xp und wie viel du noch brauchst um aufzusteigen.\n!top - Zeigt die Top 5 Benutzer.")
 
 
 intents = discord.Intents.default()
 intents.message_content = True
+
 
 client = MyClient(intents=intents)
 client.run(config['token'])
