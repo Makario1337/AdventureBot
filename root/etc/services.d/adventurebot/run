@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv bash
+echo "Starting Bot...."
+for (( ; ; )); do
+	let i++
+	cd /app
+	python /app/main.py
+done
+
+exit $?

@@ -5,7 +5,7 @@ import os
 from datetime import datetime, timedelta
 import random
 
-# VERSION 1.0.1
+# VERSION 1.0.2
 
 config = json.load(open('config.json'))
 
@@ -49,6 +49,7 @@ def DatabaseConnection(lSQL):
 class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged on as {self.user}')
+        await self.change_presence(activity=discord.Game(name=f"{config['prefix']}help"))
     
     async def on_message(self, message):
         lSQL =f'''SELECT * FROM USERS WHERE USERID = '{message.author.id}';'''
