@@ -17,5 +17,6 @@ RUN \
 
 
 # Copy local files
+COPY root/ /
 COPY config.json /app
 WORKDIR ${src}
